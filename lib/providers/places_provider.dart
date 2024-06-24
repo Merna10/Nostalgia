@@ -16,32 +16,34 @@ class PlacesProvider with ChangeNotifier {
 
   Stream<List<Place>> get placesStream => _placesStreamController.stream;
   List<Place> get places => _places;
-  Future<void> _loadPlaces() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    List<String>? placesStringList = prefs.getStringList('places');
-    if (placesStringList != null) {
-      _places = placesStringList.map((placeString) {
-        Map<String, dynamic> placeMap = jsonDecode(placeString);
-        return Place(
-          id: placeMap['id'] ?? '', // Add null check and default value
-          title: placeMap['title'] ?? '', // Add null check and default value
-          image: base64Decode(
-              placeMap['image'] ?? ''), // Add null check and default value
-          latitude:
-              placeMap['latitude'] ?? 0.0, // Add null check and default value
-          longitude:
-              placeMap['longitude'] ?? 0.0, // Add null check and default value
-          takenAt: placeMap['takenAt'] != null
-              ? DateTime.parse(placeMap['takenAt'])
-              : DateTime.now(), // Handle null or invalid dates
-        );
-      }).toList();
-      _placesStreamController.add(_places);
-    }
+
+ Future<void> _loadPlaces() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  List<String>? placesStringList = prefs.getStringList('places');
+  if (placesStringList != null) {
+    _places = placesStringList.map((placeString) {
+      Map<String, dynamic> placeMap = jsonDecode(placeString);
+      return Place(
+        id: placeMap['id'] ?? '',
+        title: placeMap['title'] ?? '',
+        image: base64Decode(placeMap['image'] ?? ''),
+        latitude: placeMap['latitude'] ?? 0.0,
+        longitude: placeMap['longitude'] ?? 0.0,
+        takenAt: placeMap['takenAt'] != null
+            ? DateTime.parse(placeMap['takenAt'])
+            : DateTime.now(),
+      );
+    }).toList();
   }
+  _placesStreamController.add(_places); // Notify listeners regardless of data existence
+}
 
   Future<void> savePlace(
-      String title, List<int> image, double latitude, double longitude) async {
+    String title,
+    List<int> image,
+    double latitude,
+    double longitude,
+  ) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -54,7 +56,6 @@ class PlacesProvider with ChangeNotifier {
         takenAt: DateTime.now(),
       );
 
-      // Add the new place to the list
       _places.add(newPlace);
       List<String> placesStringList = _places.map((place) {
         return jsonEncode({
@@ -63,27 +64,26 @@ class PlacesProvider with ChangeNotifier {
           'image': base64Encode(place.image),
           'latitude': place.latitude,
           'longitude': place.longitude,
-          'takenAt': place.takenAt.toString(), // Convert DateTime to String
+          'takenAt': place.takenAt.toString(),
         });
       }).toList();
 
       await prefs.setStringList('places', placesStringList);
 
-      // Notify listeners after the update is successful
       _placesStreamController.add(_places);
-      _loadPlaces();
       notifyListeners();
     } catch (e) {
-      // Handle any exceptions or errors here
       print('Error saving place: $e');
-      // Optionally show a snackbar or alert dialog to inform the user about the error
     }
   }
 
-  void deletePlace(String placeId) {
-    _places.removeWhere((place) => place.id == placeId);
-    _placesStreamController.add(_places);
+  void deletePlaces(List<String> ids) {
+    _places.removeWhere((place) => ids.contains(place.id));
     notifyListeners();
-    _loadPlaces();
+  }
+
+  void dispose() {
+    _placesStreamController.close();
+    super.dispose();
   }
 }

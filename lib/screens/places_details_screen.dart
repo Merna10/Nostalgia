@@ -84,8 +84,11 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              HexColor('8AC6D1'),
-              HexColor('E8F6EF'),
+              HexColor('1f2022'),
+              HexColor('1f2c32'),
+              HexColor('0e626d'),
+              HexColor('358491'),
+              HexColor('e1e2e4'),
             ],
           ),
         ),
@@ -112,9 +115,8 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                   _imageBytes != null
                       ? Image.memory(
                           _imageBytes!,
-                          height: 260,
                           width: double.infinity,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fitHeight,
                         )
                       : const SizedBox(
                           height: 250,
@@ -149,12 +151,12 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                   Row(
                     children: [
                       SizedBox(
-                        width: 180,
+                        width: MediaQuery.sizeOf(context).width * 0.45,
                         height: 200,
                         child: Column(
                           children: [
                             Container(
-                              color: HexColor('FFB6B9'),
+                              color: HexColor('ff6608'),
                               width: double.infinity,
                               padding: const EdgeInsets.all(8.0),
                               child: Center(
@@ -182,7 +184,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                       textStyle: TextStyle(
                                         fontSize: 40,
                                         fontWeight: FontWeight.bold,
-                                        color: HexColor('8AC6D1'),
+                                        color: HexColor('7a9fa7'),
                                       ),
                                     ),
                                   ),
@@ -193,7 +195,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                       textStyle: TextStyle(
                                         fontSize: 40,
                                         fontWeight: FontWeight.bold,
-                                        color: HexColor('8AC6D1'),
+                                        color: HexColor('7a9fa7'),
                                       ),
                                     ),
                                   ),
@@ -206,7 +208,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                       ),
                       const SizedBox(width: 10), // Add space between boxes
                       Container(
-                        width: 180,
+                        width: MediaQuery.sizeOf(context).width * 0.43,
                         height: 200,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),

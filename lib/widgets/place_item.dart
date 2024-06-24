@@ -1,56 +1,33 @@
-import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:nostalgia/providers/places_provider.dart';
-import 'package:nostalgia/screens/places_details_screen.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/place.dart';
+import '../screens/places_details_screen.dart';
 
 class PlaceItem extends StatefulWidget {
   final Place place;
+  final Function(Place) onSelected;
+  final bool isSelected;
+  final bool isSelectionMode;
 
-  const PlaceItem({required this.place});
+  const PlaceItem({
+    required this.place,
+    required this.onSelected,
+    required this.isSelected,
+    required this.isSelectionMode,
+  });
 
   @override
   _PlaceItemState createState() => _PlaceItemState();
 }
 
 class _PlaceItemState extends State<PlaceItem> {
-  String _placeName = 'Loading...';
   Uint8List? _imageBytes;
 
   @override
   void initState() {
     super.initState();
     _loadImage();
-  }
-
-  Future<void> _deleteImage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    // Remove the place from the list
-    Provider.of<PlacesProvider>(context, listen: false)
-        .deletePlace(widget.place.id);
-
-    // Save the updated list to SharedPreferences
-    List<Place> updatedPlaces =
-        Provider.of<PlacesProvider>(context, listen: false).places;
-    List<String> placesStringList = updatedPlaces.map((place) {
-      return jsonEncode({
-        'title': place.title,
-        'image': base64Encode(place.image),
-        'latitude': place.latitude,
-        'longitude': place.longitude,
-      });
-    }).toList();
-    await prefs.setStringList('places', placesStringList);
-
-    setState(() {
-      _imageBytes = null;
-    });
   }
 
   Future<void> _loadImage() async {
@@ -63,80 +40,67 @@ class _PlaceItemState extends State<PlaceItem> {
     }
   }
 
-  void _showDeleteConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Image'),
-        content: const Text('Are you sure you want to delete this image?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              _deleteImage();
-              Navigator.of(context).pop();
-            },
-            child: const Text('Delete'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ItemDetailsScreen(place: widget.place),
-          ),
-        );
+        if (widget.isSelectionMode) {
+          widget.onSelected(widget.place);
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ItemDetailsScreen(place: widget.place),
+            ),
+          );
+        }
+      },
+      onLongPress: () {
+        widget.onSelected(widget.place);
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _imageBytes != null
-              ? GestureDetector(
-                  onLongPress: _showDeleteConfirmationDialog,
-                  child: Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            20.0), // Adjust the value for more or less roundness
-                        child: Image.memory(
-                          _imageBytes!,
-                          width: double.infinity,
-                          height: 190,
-                          fit: BoxFit.cover,
-                          
+              ? Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(20.0),
+                      child: Image.memory(
+                        _imageBytes!,
+                        width: double.infinity,
+                        height: MediaQuery.sizeOf(context).height * 0.22,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    if (widget.isSelected)
+                      const Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Icon(
+                          Icons.check_circle,
+                          color: Colors.white,
+                          size: 30,
                         ),
                       ),
-                      Positioned(
-                        top: 80,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Text(
-                            widget.place.title,
-                            style: GoogleFonts.acme(
-                              textStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                              ),
+                    Positioned(
+                      top: 80,
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: Text(
+                          widget.place.title,
+                          style: GoogleFonts.acme(
+                            textStyle: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 )
               : const Placeholder(),
         ],

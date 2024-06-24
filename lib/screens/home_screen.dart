@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:nostalgia/screens/places_screen.dart';
 
 class HomePage extends StatelessWidget {
@@ -12,14 +13,14 @@ class HomePage extends StatelessWidget {
         decoration: const BoxDecoration(
           image: DecorationImage(
             image: AssetImage(
-                'assets/images/view-camera-with-blossoming-spring-flowers_23-2150890420.jpg'), // Change to your image path
+                'assets/images/desktop-wallpaper-forever-love-by-emelievarenhed-forever-love.jpg'), // Change to your image path
             fit: BoxFit.cover,
           ),
         ),
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.15,
+              height: MediaQuery.sizeOf(context).height * 0.05,
             ),
             Text(
               "Nostalgia",
@@ -30,29 +31,30 @@ class HomePage extends StatelessWidget {
                     color: Colors.white),
               ),
             ),
-            const Center(
+            Center(
               child: Text(
                 'Only photograph what you love',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                style: GoogleFonts.acme(
+                  textStyle: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
               ),
             ),
             SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.4,
+              height: MediaQuery.sizeOf(context).height * 0.02,
             ),
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => const PlacesListScreen()),
+                    MaterialPageRoute(builder: (context) => PlacesListScreen()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
+                  backgroundColor: HexColor('ff6608'),
                   minimumSize: const Size(0, 50), // Set the desired height here
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   textStyle: const TextStyle(
@@ -60,11 +62,13 @@ class HomePage extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
-                child: const Text(
+                child: Text(
                   'Make memories',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
+                  style: GoogleFonts.acme(
+                    textStyle: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                 ),
               ),

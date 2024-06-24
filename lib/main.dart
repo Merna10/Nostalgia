@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
       child: CalendarControllerProvider(
         controller: EventController(),
         child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Places App',
           theme: ThemeData(
             primarySwatch: Colors.blue,

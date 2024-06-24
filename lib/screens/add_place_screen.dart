@@ -131,8 +131,11 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              HexColor('8AC6D1'),
-              HexColor('E8F6EF'),
+              HexColor('1f2022'),
+              HexColor('1f2c32'),
+              HexColor('0e626d'),
+              HexColor('358491'),
+              HexColor('e1e2e4'),
             ],
           ),
         ),
@@ -204,14 +207,14 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                           IconButton(
                             icon: Icon(
                               Icons.camera,
-                              color: HexColor('FFB6B9'),
+                              color: HexColor('ff6608'),
                             ),
                             onPressed: _takePhoto,
                           ),
                           IconButton(
                             icon: Icon(
                               Icons.folder,
-                              color: HexColor('FFB6B9'),
+                              color: HexColor('ff6608'),
                             ),
                             onPressed: _pickImage,
                           ),
@@ -245,7 +248,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                           IconButton(
                             icon: Icon(
                               Icons.location_on,
-                              color: HexColor('FFB6B9'),
+                              color: HexColor('ff6608'),
                             ),
                             onPressed: () async {
                               await _getCurrentLocation();
@@ -313,7 +316,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.black,
-                          backgroundColor: HexColor('FFB6B9'),
+                          backgroundColor: HexColor('ff6608'),
                           elevation: 0,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),

@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "600381062247",
+    "project_id": "nostalgia-87ac0",
+    "storage_bucket": "nostalgia-87ac0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600381062247:android:84314ff365e75c52ce28c2",
+        "android_client_info": {
+          "package_name": "com.example.memo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKUXfz3EjUo0vcKt0V3s7bY_Yvb3587Jw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600381062247:android:c051d34f74a7789cce28c2",
+        "android_client_info": {
+          "package_name": "com.example.nostalgia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKUXfz3EjUo0vcKt0V3s7bY_Yvb3587Jw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -80,7 +80,6 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
       String locationTitle = placemarks.first.name ?? 'Unknown Location';
       print('Location Name: $locationTitle');
 
-      // Move the map to the current location
       if (_locationData != null && _mapController != null) {
         _mapController!.animateCamera(
           CameraUpdate.newCameraPosition(
@@ -116,10 +115,8 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
 
       Navigator.of(context).pop();
     } catch (e) {
-      // Handle any exceptions or errors here
       print('Error saving place: $e');
-      // Optionally show a snackbar or alert dialog to inform the user about the error
-    }
+      }
   }
 
   @override

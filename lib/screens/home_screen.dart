@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.05,
+              height: MediaQuery.sizeOf(context).height * 0.07,
             ),
             Text(
               "Nostalgia",

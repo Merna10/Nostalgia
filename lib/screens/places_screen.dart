@@ -1,9 +1,9 @@
-import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:nostalgia/screens/auth.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../models/place.dart';
 import '../providers/places_provider.dart';
 import 'add_place_screen.dart';
@@ -36,23 +36,8 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
     bool confirm = await _showConfirmationDialog();
     if (!confirm) return;
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Provider.of<PlacesProvider>(context, listen: false)
+    await Provider.of<PlacesProvider>(context, listen: false)
         .deletePlaces(selectedPlaces.map((e) => e.id).toList());
-
-    List<Place> updatedPlaces =
-        Provider.of<PlacesProvider>(context, listen: false).places;
-    List<String> placesStringList = updatedPlaces.map((place) {
-      return jsonEncode({
-        'id': place.id,
-        'title': place.title,
-        'image': base64Encode(place.image),
-        'latitude': place.latitude,
-        'longitude': place.longitude,
-        'takenAt': place.takenAt.toString(),
-      });
-    }).toList();
-    await prefs.setStringList('places', placesStringList);
 
     setState(() {
       selectedPlaces.clear();
@@ -132,9 +117,10 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                             onPressed: _deleteSelectedPlaces,
                           ),
                         IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.add,
-                            color: Colors.white,
+                            size: 32.0,
+                            color: HexColor('ff6608'),
                           ),
                           onPressed: () {
                             Navigator.of(context).push(
@@ -144,6 +130,18 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                             );
                           },
                         ),
+                        IconButton(
+                            onPressed: () {
+                              FirebaseAuth.instance.signOut();
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => const AuthScreen()),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.logout_outlined,
+                              color: Colors.white,
+                            ))
                       ],
                     )
                   ],

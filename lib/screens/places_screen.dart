@@ -8,7 +8,6 @@ import '../models/place.dart';
 import '../providers/places_provider.dart';
 import 'add_place_screen.dart';
 import '../widgets/place_item.dart';
-
 class PlacesListScreen extends StatefulWidget {
   const PlacesListScreen({Key? key}) : super(key: key);
 
@@ -79,6 +78,8 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
       body: Consumer<PlacesProvider>(
         builder: (context, placesProvider, _) {
           List<Place> places = placesProvider.places;
+          bool isLoading = placesProvider.isLoading;
+
           return Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -149,34 +150,37 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(6.0),
-                    child: places.isEmpty
-                        ? Center(
-                            child: Text(
-                              'Got no places yet, start adding some!',
-                              style: GoogleFonts.acme(
-                                textStyle: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                    child: isLoading
+                        ? const Center(child: CircularProgressIndicator(color: Colors.white,))
+                        : places.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'Got no places yet, start adding some!',
+                                  style: GoogleFonts.acme(
+                                    textStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : GridView.builder(
+                                gridDelegate:
+                                    const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 7.0,
+                                  mainAxisSpacing: 5.0,
+                                ),
+                                itemCount: places.length,
+                                itemBuilder: (ctx, i) => PlaceItem(
+                                  place: places[i],
+                                  isSelected:
+                                      selectedPlaces.contains(places[i]),
+                                  onSelected: _onPlaceSelected,
+                                  isSelectionMode: isSelectionMode,
                                 ),
                               ),
-                            ),
-                          )
-                        : GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 7.0,
-                              mainAxisSpacing: 5.0,
-                            ),
-                            itemCount: places.length,
-                            itemBuilder: (ctx, i) => PlaceItem(
-                              place: places[i],
-                              isSelected: selectedPlaces.contains(places[i]),
-                              onSelected: _onPlaceSelected,
-                              isSelectionMode: isSelectionMode,
-                            ),
-                          ),
                   ),
                 ),
               ],

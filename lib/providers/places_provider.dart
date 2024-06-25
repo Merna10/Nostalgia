@@ -4,17 +4,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../models/place.dart';
-
 class PlacesProvider with ChangeNotifier {
   List<Place> _places = [];
+  bool _isLoading = true;
 
   PlacesProvider() {
     _loadPlaces();
   }
 
   List<Place> get places => _places;
+  bool get isLoading => _isLoading;
 
   Future<void> _loadPlaces() async {
+    _isLoading = true;
+    notifyListeners();
+
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       CollectionReference memoriesCollection = FirebaseFirestore.instance
@@ -38,6 +42,7 @@ class PlacesProvider with ChangeNotifier {
         );
       }).toList();
 
+      _isLoading = false;
       notifyListeners();
     }
   }
@@ -95,13 +100,10 @@ class PlacesProvider with ChangeNotifier {
       }
 
       _places.removeWhere((place) => ids.contains(place.id));
-      await _loadPlaces(); // Reload the list of places after deletion
+      await _loadPlaces(); 
       notifyListeners();
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
+  
 }

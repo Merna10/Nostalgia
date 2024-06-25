@@ -10,16 +10,18 @@ import 'package:nostalgia/providers/auth_provider.dart' as custom_auth;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (_) => custom_auth.AuthProvider()), // Use the alias here
+            create: (_) => custom_auth.AuthProvider()), 
         ChangeNotifierProvider(create: (_) => PlacesProvider()),
       ],
       child: MaterialApp(

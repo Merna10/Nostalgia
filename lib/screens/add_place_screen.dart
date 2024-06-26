@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -103,12 +101,10 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
       return;
     }
 
-    List<int> imageBytes = await _pickedImage!.readAsBytes();
-
     try {
       await Provider.of<PlacesProvider>(context, listen: false).savePlace(
         _titleController.text,
-        imageBytes,
+        _pickedImage!.path, // Pass the image path correctly
         _locationData!.latitude,
         _locationData!.longitude,
       );
@@ -116,7 +112,7 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
       Navigator.of(context).pop();
     } catch (e) {
       print('Error saving place: $e');
-      }
+    }
   }
 
   @override
@@ -201,19 +197,23 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
                                     height: 150,
                                   ),
                           ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.camera,
-                              color: HexColor('ff6608'),
-                            ),
-                            onPressed: _takePhoto,
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.folder,
-                              color: HexColor('ff6608'),
-                            ),
-                            onPressed: _pickImage,
+                          Column(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.camera,
+                                  color: HexColor('ff6608'),
+                                ),
+                                onPressed: _takePhoto,
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.folder,
+                                  color: HexColor('ff6608'),
+                                ),
+                                onPressed: _pickImage,
+                              ),
+                            ],
                           ),
                         ],
                       ),

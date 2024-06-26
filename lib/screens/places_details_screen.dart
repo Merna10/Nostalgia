@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,14 +16,12 @@ class ItemDetailsScreen extends StatefulWidget {
 
 class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
   String _placeName = 'Loading...';
-  Uint8List? _imageBytes;
   late CameraPosition _initialCameraPosition;
 
   @override
   void initState() {
     super.initState();
     _fetchPlaceName();
-    _loadImage();
     _initialCameraPosition = CameraPosition(
       target: LatLng(widget.place.latitude, widget.place.longitude),
       zoom: 14,
@@ -65,15 +61,6 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
     'November',
     'December'
   ];
-  Future<void> _loadImage() async {
-    try {
-      setState(() {
-        _imageBytes = Uint8List.fromList(widget.place.image);
-      });
-    } catch (e) {
-      print('Error loading image: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,17 +100,12 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _imageBytes != null
-                        ? Image.memory(
-                            _imageBytes!,
-                            width: double.infinity,
-                            height: MediaQuery.sizeOf(context).height * 0.444,
-                            fit: BoxFit.fill,
-                          )
-                        : const SizedBox(
-                            height: 250,
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
+                    Image.network(
+                      widget.place.imageUrl,
+                      width: double.infinity,
+                      height: MediaQuery.sizeOf(context).height * 0.444,
+                      fit: BoxFit.fill,
+                    ),
                     const SizedBox(height: 10),
                     Center(
                       child: Text(

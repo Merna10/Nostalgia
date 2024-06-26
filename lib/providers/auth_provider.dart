@@ -17,6 +17,7 @@ class AuthProvider with ChangeNotifier {
   bool get isLogin => _isLogin;
   bool get isAuthenticating => _isAuthenticating;
   bool get loggedIn => _loggedIn;
+
   set isLogin(bool value) {
     _isLogin = value;
     notifyListeners();
@@ -27,23 +28,19 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> submit(
-      String email, String password, BuildContext context) async {
+  Future<void> submit(String email, String password, BuildContext context) async {
     try {
       isAuthenticating = true;
       if (_isLogin) {
-        final UserCredential userCredential =
-            await _firebaseAuth.signInWithEmailAndPassword(
+        final UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
 
-        if (userCredential.user!.emailVerified) {
-          Navigator.push(
+        if (userCredential.user != null && userCredential.user!.emailVerified) {
+          Navigator.pushReplacement(
             context,
-            MaterialPageRoute(
-              builder: (context) => const HomePage(),
-            ),
+            MaterialPageRoute(builder: (context) => const HomePage()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -51,10 +48,11 @@ class AuthProvider with ChangeNotifier {
               content: Text('Email not verified. Please check your email.'),
             ),
           );
+          isAuthenticating = false; // Stop authentication process
+          notifyListeners();
         }
       } else {
-        final UserCredential userCredential =
-            await _firebaseAuth.createUserWithEmailAndPassword(
+        final UserCredential userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
@@ -66,17 +64,15 @@ class AuthProvider with ChangeNotifier {
           email: email,
         );
 
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .set(user.toMap());
+        await FirebaseFirestore.instance.collection('users').doc(userCredential.user!.uid).set(user.toMap());
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text(
-                'Verification email sent. Please verify your email before logging in.'),
+            content: Text('Verification email sent. Please verify your email before logging in.'),
           ),
         );
+        isAuthenticating = false; // Stop authentication process
+        notifyListeners();
       }
     } on FirebaseAuthException catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -84,8 +80,8 @@ class AuthProvider with ChangeNotifier {
           content: Text(error.message ?? 'Authentication failed.'),
         ),
       );
-    } finally {
-      isAuthenticating = false;
+      isAuthenticating = false; // Stop authentication process in case of error
+      notifyListeners();
     }
   }
 
@@ -119,19 +115,16 @@ class AuthProvider with ChangeNotifier {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser != null) {
-        final GoogleSignInAuthentication googleAuth =
-            await googleUser.authentication;
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
         final AuthCredential credential = GoogleAuthProvider.credential(
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        final UserCredential userCredential =
-            await _firebaseAuth.signInWithCredential(credential);
+        final UserCredential userCredential = await _firebaseAuth.signInWithCredential(credential);
         final User? user = userCredential.user;
 
         if (user != null) {
-          final userDoc =
-              FirebaseFirestore.instance.collection('users').doc(user.uid);
+          final userDoc = FirebaseFirestore.instance.collection('users').doc(user.uid);
           final userSnapshot = await userDoc.get();
 
           if (!userSnapshot.exists) {
@@ -143,12 +136,10 @@ class AuthProvider with ChangeNotifier {
             await userDoc.set(newUser.toMap());
           }
 
-          if (user.emailVerified) {
-            Navigator.push(
+          if (user.emailVerified ) {
+            Navigator.pushReplacement(
               context,
-              MaterialPageRoute(
-                builder: (context) => const HomePage(),
-              ),
+              MaterialPageRoute(builder: (context) => const HomePage()),
             );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -156,6 +147,8 @@ class AuthProvider with ChangeNotifier {
                 content: Text('Email not verified. Please check your email.'),
               ),
             );
+            isAuthenticating = false; // Stop authentication process
+            notifyListeners();
           }
         }
       }
@@ -165,6 +158,8 @@ class AuthProvider with ChangeNotifier {
           content: Text('Google Sign-In failed: ${error.toString()}'),
         ),
       );
+      isAuthenticating = false; // Stop authentication process in case of error
+      notifyListeners();
     }
   }
 }

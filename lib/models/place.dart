@@ -1,9 +1,7 @@
-import 'dart:convert';
-
 class Place {
   final String id;
   final String title;
-  final List<int> image;
+  final String imageUrl;
   final double latitude;
   final double longitude;
   final DateTime takenAt;
@@ -11,7 +9,7 @@ class Place {
   Place({
     required this.id,
     required this.title,
-    required this.image,
+    required this.imageUrl,
     required this.latitude,
     required this.longitude,
     required this.takenAt,
@@ -21,21 +19,21 @@ class Place {
     return {
       'id': id,
       'title': title,
-      'image': image,
+      'imageUrl': imageUrl,
       'latitude': latitude,
       'longitude': longitude,
       'takenAt': takenAt.toIso8601String(),
     };
   }
 
-  factory Place.fromJson(Map<String, dynamic> json) {
+  static Place fromJson(Map<String, dynamic> json) {
     return Place(
-      id: json['id'],
-      title: json['title'],
-      image: List<int>.from(json['image']),
-      latitude: json['latitude'],
-      longitude: json['longitude'],
-      takenAt: DateTime.parse(json['takenAt']),
+      id: json['id'] ?? '',
+      title: json['title'] ?? 'Untitled',
+      imageUrl: json['imageUrl'] ?? '',
+      latitude: (json['latitude'] ?? 0.0).toDouble(),
+      longitude: (json['longitude'] ?? 0.0).toDouble(),
+      takenAt: DateTime.tryParse(json['takenAt'] ?? '') ?? DateTime.now(),
     );
   }
 }

@@ -1,13 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:nostalgia/screens/auth.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../models/place.dart';
 import '../providers/places_provider.dart';
 import 'add_place_screen.dart';
 import '../widgets/place_item.dart';
+import '../widgets/restart_widget.dart';
+
 class PlacesListScreen extends StatefulWidget {
   const PlacesListScreen({Key? key}) : super(key: key);
 
@@ -46,30 +48,30 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
 
   Future<bool> _showConfirmationDialog() async {
     return await showDialog<bool>(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Confirm Deletion'),
-              content: const Text(
-                  'Are you sure you want to delete the selected images?'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: const Text('Cancel'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                  child: const Text('Delete'),
-                ),
-              ],
-            );
-          },
-        ) ??
-        false;
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Confirm Deletion'),
+          content: const Text(
+            'Are you sure you want to delete the selected places?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    ) ?? false;
   }
 
   @override
@@ -77,7 +79,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
     return Scaffold(
       body: Consumer<PlacesProvider>(
         builder: (context, placesProvider, _) {
-          List<Place> places = placesProvider.places;
+          List<Place> places = Provider.of<List<Place>>(context);
           bool isLoading = placesProvider.isLoading;
 
           return Container(
@@ -103,8 +105,10 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                     child: Text(
                       "Nostalgia",
                       style: GoogleFonts.acme(
-                        textStyle:
-                            const TextStyle(fontSize: 40, color: Colors.white),
+                        textStyle: const TextStyle(
+                          fontSize: 40,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
@@ -113,8 +117,10 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                       children: [
                         if (selectedPlaces.isNotEmpty)
                           IconButton(
-                            icon: const Icon(Icons.delete,
-                                color: Color.fromARGB(255, 207, 11, 11)),
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Color.fromARGB(255, 207, 11, 11),
+                            ),
                             onPressed: _deleteSelectedPlaces,
                           ),
                         IconButton(
@@ -132,17 +138,15 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                           },
                         ),
                         IconButton(
-                            onPressed: () {
-                              FirebaseAuth.instance.signOut();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => const AuthScreen()),
-                              );
-                            },
-                            icon: const Icon(
-                              Icons.logout_outlined,
-                              color: Colors.white,
-                            ))
+                          onPressed: () {
+                            FirebaseAuth.instance.signOut();
+                            RestartWidget.restartApp(context);
+                          },
+                          icon: const Icon(
+                            Icons.logout_outlined,
+                            color: Colors.white,
+                          ),
+                        )
                       ],
                     )
                   ],
@@ -151,11 +155,15 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(6.0),
                     child: isLoading
-                        ? const Center(child: CircularProgressIndicator(color: Colors.white,))
+                        ? const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
                         : places.isEmpty
                             ? Center(
                                 child: Text(
-                                  'Got no places yet, start adding some!',
+                                  'No places yet, start adding some!',
                                   style: GoogleFonts.acme(
                                     textStyle: const TextStyle(
                                       color: Colors.white,

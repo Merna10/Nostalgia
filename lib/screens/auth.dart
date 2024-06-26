@@ -143,18 +143,18 @@ class AuthScreen extends StatelessWidget {
                                                     255, 231, 232, 233)),
                                         foregroundColor:
                                             WidgetStateProperty.all<Color>(
-                                                const Color.fromARGB(
-                                                    255, 26, 115, 44)),
+                                          HexColor('0e626d'),
+                                        ),
                                         textStyle:
                                             WidgetStateProperty.all<TextStyle>(
                                           const TextStyle(fontSize: 16),
                                         ),
-                                        padding: MaterialStateProperty.all<
+                                        padding: WidgetStateProperty.all<
                                             EdgeInsetsGeometry>(
                                           const EdgeInsets.symmetric(
                                               horizontal: 16, vertical: 10),
                                         ),
-                                        shape: MaterialStateProperty.all<
+                                        shape: WidgetStateProperty.all<
                                             OutlinedBorder>(
                                           RoundedRectangleBorder(
                                             borderRadius:
@@ -163,7 +163,10 @@ class AuthScreen extends StatelessWidget {
                                         ),
                                       ),
                                       child: Text(
-                                          auth.isLogin ? 'Login' : 'Sign Up'),
+                                        auth.isLogin ? 'Login' : 'Sign Up',
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   SignInButton(
                                     buttonType: ButtonType.google,

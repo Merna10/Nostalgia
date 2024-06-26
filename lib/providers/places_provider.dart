@@ -1,61 +1,65 @@
-import 'dart:convert';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
+
 import '../models/place.dart';
+
 class PlacesProvider with ChangeNotifier {
   List<Place> _places = [];
-  bool _isLoading = true;
-
-  PlacesProvider() {
-    _loadPlaces();
-  }
+  bool _isLoading = false;
 
   List<Place> get places => _places;
   bool get isLoading => _isLoading;
 
-  Future<void> _loadPlaces() async {
-    _isLoading = true;
-    notifyListeners();
-
+  Stream<List<Place>> get placesStream {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      CollectionReference memoriesCollection = FirebaseFirestore.instance
+      return FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
-          .collection('memories');
-
-      QuerySnapshot querySnapshot = await memoriesCollection.get();
-
-      _places = querySnapshot.docs.map((doc) {
-        Map<String, dynamic> placeMap = doc.data() as Map<String, dynamic>;
-        return Place(
-          id: placeMap['id'] ?? '',
-          title: placeMap['title'] ?? '',
-          image: base64Decode(placeMap['image'] ?? ''),
-          latitude: placeMap['latitude'] ?? 0.0,
-          longitude: placeMap['longitude'] ?? 0.0,
-          takenAt: placeMap['takenAt'] != null
-              ? DateTime.parse(placeMap['takenAt'])
-              : DateTime.now(),
-        );
-      }).toList();
-
-      _isLoading = false;
+          .collection('memories')
+          .orderBy('takenAt', descending: true)
+          .snapshots()
+          .map((snapshot) {
+        _places = snapshot.docs.map((doc) {
+          Map<String, dynamic> placeMap = doc.data() as Map<String, dynamic>;
+          return Place.fromJson(placeMap);
+        }).toList();
+        notifyListeners();
+        return _places;
+      });
+    } else {
+      _places = [];
       notifyListeners();
+      return Stream.value(_places);
     }
   }
 
   Future<void> savePlace(
     String title,
-    List<int> image,
+    String imagePath,
     double latitude,
     double longitude,
   ) async {
     try {
+      _isLoading = true;
+      notifyListeners();
+
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
+        String imageId = const Uuid().v4();
+        Reference storageRef = FirebaseStorage.instance
+            .ref()
+            .child('users/${user.uid}/memories/$imageId');
+        UploadTask uploadTask = storageRef.putFile(File(imagePath));
+
+        TaskSnapshot taskSnapshot = await uploadTask;
+        String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
         CollectionReference memoriesCollection = FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
@@ -64,46 +68,47 @@ class PlacesProvider with ChangeNotifier {
         Place newPlace = Place(
           id: const Uuid().v4(),
           title: title,
-          image: image,
+          imageUrl: downloadUrl,
           latitude: latitude,
           longitude: longitude,
           takenAt: DateTime.now(),
         );
 
-        await memoriesCollection.doc(newPlace.id).set({
-          'id': newPlace.id,
-          'title': newPlace.title,
-          'image': base64Encode(newPlace.image),
-          'latitude': newPlace.latitude,
-          'longitude': newPlace.longitude,
-          'takenAt': newPlace.takenAt.toIso8601String(),
-        });
+        await memoriesCollection.doc(newPlace.id).set(newPlace.toJson());
 
-        _places.add(newPlace);
+        _isLoading = false;
         notifyListeners();
       }
     } catch (e) {
+      _isLoading = false;
+      notifyListeners();
       print('Error saving place: $e');
     }
   }
 
   Future<void> deletePlaces(List<String> ids) async {
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      CollectionReference memoriesCollection = FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .collection('memories');
-
-      for (String id in ids) {
-        await memoriesCollection.doc(id).delete();
-      }
-
-      _places.removeWhere((place) => ids.contains(place.id));
-      await _loadPlaces(); 
+    try {
+      _isLoading = true;
       notifyListeners();
+
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        CollectionReference memoriesCollection = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('memories');
+
+        for (String id in ids) {
+          await memoriesCollection.doc(id).delete();
+        }
+
+        _isLoading = false;
+        notifyListeners();
+      }
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      print('Error deleting places: $e');
     }
   }
-
-  
 }

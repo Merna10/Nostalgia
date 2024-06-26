@@ -15,8 +15,9 @@ class PlacesProvider with ChangeNotifier {
   List<Place> get places => _places;
   bool get isLoading => _isLoading;
 
+  // Stream to get places in real-time
   Stream<List<Place>> get placesStream {
-     _isLoading = true;
+    _setLoading(true);
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       return FirebaseFirestore.instance
@@ -27,91 +28,91 @@ class PlacesProvider with ChangeNotifier {
           .snapshots()
           .map((snapshot) {
         _places = snapshot.docs.map((doc) {
-          Map<String, dynamic> placeMap = doc.data() as Map<String, dynamic>;
-          return Place.fromJson(placeMap);
+          return Place.fromMap(doc.data());
         }).toList();
-         _isLoading = false;
-        notifyListeners();
+        _setLoading(false);
         return _places;
       });
     } else {
-      _places = [];
-       _isLoading = false;
-      notifyListeners();
-      return Stream.value(_places);
+      _setLoading(false);
+      return Stream.value([]);
     }
   }
 
+  // Save a new place
   Future<void> savePlace(
     String title,
     String imagePath,
     double latitude,
     double longitude,
   ) async {
+    _setLoading(true);
+
     try {
-      _isLoading = true;
-      notifyListeners();
-
       User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        String imageId = const Uuid().v4();
-        Reference storageRef = FirebaseStorage.instance
-            .ref()
-            .child('users/${user.uid}/memories/$imageId');
-        UploadTask uploadTask = storageRef.putFile(File(imagePath));
+      if (user == null) return;
 
-        TaskSnapshot taskSnapshot = await uploadTask;
-        String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+      String imageId = const Uuid().v4();
+      Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child('users/${user.uid}/memories/$imageId');
+      UploadTask uploadTask = storageRef.putFile(File(imagePath));
 
-        CollectionReference memoriesCollection = FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .collection('memories');
+      TaskSnapshot taskSnapshot = await uploadTask;
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
 
-        Place newPlace = Place(
-          id: const Uuid().v4(),
-          title: title,
-          imageUrl: downloadUrl,
-          latitude: latitude,
-          longitude: longitude,
-          takenAt: DateTime.now(),
-        );
+      Place newPlace = Place(
+        id: const Uuid().v4(),
+        title: title,
+        imageUrl: downloadUrl,
+        latitude: latitude,
+        longitude: longitude,
+        takenAt: DateTime.now(),
+      );
 
-        await memoriesCollection.doc(newPlace.id).set(newPlace.toJson());
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .collection('memories')
+          .doc(newPlace.id)
+          .set(newPlace.toMap());
 
-        _isLoading = false;
-        notifyListeners();
-      }
+      _places.add(newPlace);
     } catch (e) {
-      _isLoading = false;
-      notifyListeners();
       print('Error saving place: $e');
+    } finally {
+      _setLoading(false);
     }
   }
 
+  // Delete multiple places
   Future<void> deletePlaces(List<String> ids) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
+    _setLoading(true);
 
+    try {
       User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
-        CollectionReference memoriesCollection = FirebaseFirestore.instance
+      if (user == null) return;
+
+      for (String id in ids) {
+        await FirebaseFirestore.instance
             .collection('users')
             .doc(user.uid)
-            .collection('memories');
-
-        for (String id in ids) {
-          await memoriesCollection.doc(id).delete();
-        }
-
-        _isLoading = false;
-        notifyListeners();
+            .collection('memories')
+            .doc(id)
+            .delete();
       }
+
+      _places.removeWhere((place) => ids.contains(place.id));
     } catch (e) {
-      _isLoading = false;
-      notifyListeners();
       print('Error deleting places: $e');
+    } finally {
+      _setLoading(false);
     }
+  }
+
+  // Private method to set loading state and notify listeners
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
   }
 }

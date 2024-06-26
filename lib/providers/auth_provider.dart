@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:nostalgia/screens/home_screen.dart';
 import 'package:uuid/uuid.dart';
+import 'package:nostalgia/screens/home_screen.dart';
 import 'package:nostalgia/models/user.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -136,7 +136,7 @@ class AuthProvider with ChangeNotifier {
             await userDoc.set(newUser.toMap());
           }
 
-          if (user.emailVerified ) {
+          if (user.emailVerified) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HomePage()),

@@ -48,7 +48,7 @@ class AuthProvider with ChangeNotifier {
               content: Text('Email not verified. Please check your email.'),
             ),
           );
-          isAuthenticating = false; // Stop authentication process
+          isAuthenticating = false; 
           notifyListeners();
         }
       } else {
@@ -80,7 +80,7 @@ class AuthProvider with ChangeNotifier {
           content: Text(error.message ?? 'Authentication failed.'),
         ),
       );
-      isAuthenticating = false; // Stop authentication process in case of error
+      isAuthenticating = false; 
       notifyListeners();
     }
   }

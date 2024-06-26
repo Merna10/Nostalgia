@@ -16,6 +16,7 @@ class PlacesProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Stream<List<Place>> get placesStream {
+     _isLoading = true;
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       return FirebaseFirestore.instance
@@ -29,11 +30,13 @@ class PlacesProvider with ChangeNotifier {
           Map<String, dynamic> placeMap = doc.data() as Map<String, dynamic>;
           return Place.fromJson(placeMap);
         }).toList();
+         _isLoading = false;
         notifyListeners();
         return _places;
       });
     } else {
       _places = [];
+       _isLoading = false;
       notifyListeners();
       return Stream.value(_places);
     }

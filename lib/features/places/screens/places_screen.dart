@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:nostalgia/core/widgets/restart_widget.dart';
+import 'package:nostalgia/features/places/data/model/place.dart';
+import 'package:nostalgia/features/places/data/providers/places_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-import '../models/place.dart';
-import '../providers/places_provider.dart';
 import 'add_place_screen.dart';
 import '../widgets/place_item.dart';
-import '../widgets/restart_widget.dart';
 
 class PlacesListScreen extends StatefulWidget {
   const PlacesListScreen({Key? key}) : super(key: key);

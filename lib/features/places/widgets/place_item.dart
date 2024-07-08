@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/place.dart';
+import 'package:nostalgia/features/places/data/model/place.dart';
+
 import '../screens/places_details_screen.dart';
 
 class PlaceItem extends StatelessWidget {

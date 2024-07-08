@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:nostalgia/features/auth/data/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_button/sign_button.dart';
-import 'package:nostalgia/screens/home_screen.dart';
-import 'package:nostalgia/providers/auth_provider.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});

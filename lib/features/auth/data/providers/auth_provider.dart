@@ -3,8 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:uuid/uuid.dart';
-import 'package:nostalgia/screens/home_screen.dart';
-import 'package:nostalgia/models/user.dart';
+import 'package:nostalgia/features/home/presentation/screens/home_screen.dart';
+import 'package:nostalgia/features/auth/data/model/user.dart';
 
 class AuthProvider with ChangeNotifier {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;

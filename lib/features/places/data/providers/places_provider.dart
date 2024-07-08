@@ -4,9 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:nostalgia/features/places/data/model/place.dart';
 import 'package:uuid/uuid.dart';
 
-import '../models/place.dart';
 
 class PlacesProvider with ChangeNotifier {
   List<Place> _places = [];
@@ -15,7 +15,6 @@ class PlacesProvider with ChangeNotifier {
   List<Place> get places => _places;
   bool get isLoading => _isLoading;
 
-  // Stream to get places in real-time
   Stream<List<Place>> get placesStream {
     _setLoading(true);
     User? user = FirebaseAuth.instance.currentUser;
@@ -39,7 +38,6 @@ class PlacesProvider with ChangeNotifier {
     }
   }
 
-  // Save a new place
   Future<void> savePlace(
     String title,
     String imagePath,
@@ -85,7 +83,6 @@ class PlacesProvider with ChangeNotifier {
     }
   }
 
-  // Delete multiple places
   Future<void> deletePlaces(List<String> ids) async {
     _setLoading(true);
 
@@ -110,7 +107,6 @@ class PlacesProvider with ChangeNotifier {
     }
   }
 
-  // Private method to set loading state and notify listeners
   void _setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();

@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:nostalgia/core/widgets/restart_widget.dart';
+import 'package:nostalgia/features/auth/presentation/screens/auth.dart';
+import 'package:nostalgia/features/home/presentation/screens/home_screen.dart';
+import 'package:nostalgia/features/places/data/model/place.dart';
+import 'package:nostalgia/features/places/data/providers/places_provider.dart';
+import 'package:nostalgia/features/auth/data/providers/auth_provider.dart' as custom_auth;
 import 'package:provider/provider.dart';
 
-import 'screens/auth.dart';
-import 'models/place.dart';
-import 'providers/auth_provider.dart' as custom_auth;
-import 'providers/places_provider.dart';
-import 'screens/home_screen.dart';
-import 'widgets/restart_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

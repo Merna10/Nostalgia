@@ -3,12 +3,13 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hexcolor/hexcolor.dart';
-import '../models/place.dart';
+import 'package:nostalgia/features/places/data/model/place.dart';
+
 
 class ItemDetailsScreen extends StatefulWidget {
   final Place place;
 
-  const ItemDetailsScreen({required this.place});
+  const ItemDetailsScreen({super.key, required this.place});
 
   @override
   State<ItemDetailsScreen> createState() => _ItemDetailsScreenState();

@@ -4,10 +4,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nostalgia/features/places/data/providers/places_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart'; // Import Geocoding package
-import '../providers/places_provider.dart';
 
 class AddPlaceScreen extends StatefulWidget {
   @override

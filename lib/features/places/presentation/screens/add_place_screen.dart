@@ -4,10 +4,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:nostalgia/core/services/location_service.dart';
 import 'package:nostalgia/features/places/data/providers/places_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart';
 
 class AddPlaceScreen extends StatefulWidget {
   const AddPlaceScreen({super.key});
@@ -22,6 +22,8 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
   bool _isSubmitting = false;
   Position? _locationData;
   GoogleMapController? _mapController;
+
+  final LocationService _locationService = LocationService();
 
   Future<void> _pickImageFromCamera() async {
     final pickedImage = await ImagePicker().pickImage(
@@ -48,37 +50,14 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
   }
 
   Future<void> _getCurrentLocation() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    try {
+      Position position = await _locationService.getCurrentLocation();
+      String locationTitle = await _locationService.getLocationTitle(position);
+      print('Location Name: $locationTitle');
 
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-
-    permission = await Geolocator.checkPermission();
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    if (permission == LocationPermission.whileInUse) {
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
       setState(() {
         _locationData = position;
       });
-
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        _locationData!.latitude,
-        _locationData!.longitude,
-      );
-
-      String locationTitle = placemarks.first.name ?? 'Unknown Location';
-      print('Location Name: $locationTitle');
 
       if (_locationData != null && _mapController != null) {
         _mapController!.animateCamera(
@@ -93,6 +72,8 @@ class _AddPlaceScreenState extends State<AddPlaceScreen> {
           ),
         );
       }
+    } catch (e) {
+      print('Error getting location: $e');
     }
   }
 

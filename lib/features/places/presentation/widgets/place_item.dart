@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nostalgia/features/places/data/model/place.dart';
-
-import '../screens/places_details_screen.dart';
+import 'package:nostalgia/features/places/presentation/screens/places_details_screen.dart';
 
 class PlaceItem extends StatelessWidget {
   final Place place;
@@ -43,7 +42,7 @@ class PlaceItem extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(20.0),
                 child: Image.network(
-                  place.imageUrl,
+                  place.imageUrl.first,
                   width: double.infinity,
                   height: MediaQuery.sizeOf(context).height * 0.22,
                   fit: BoxFit.cover,

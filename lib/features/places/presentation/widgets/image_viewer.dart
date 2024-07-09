@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:hexcolor/hexcolor.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class ImageViewer extends StatefulWidget {
   final List<String> imageUrls;
   final int initialIndex;
 
-  const ImageViewer({super.key,required this.imageUrls, required this.initialIndex});
+  const ImageViewer(
+      {super.key, required this.imageUrls, required this.initialIndex});
 
   @override
   State<ImageViewer> createState() => _ImageViewerState();
@@ -67,7 +69,7 @@ class _ImageViewerState extends State<ImageViewer> {
                   height: 10,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: currentIndex == i ? Colors.blue : Colors.grey,
+                    color: currentIndex == i ? HexColor('ff6608') : Colors.grey,
                   ),
                 ),
             ],

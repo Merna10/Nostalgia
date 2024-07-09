@@ -6,7 +6,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:nostalgia/features/places/data/model/place.dart';
 import 'package:uuid/uuid.dart';
-
+import 'package:flutter/scheduler.dart';
 
 class PlacesProvider with ChangeNotifier {
   List<Place> _places = [];
@@ -14,33 +14,34 @@ class PlacesProvider with ChangeNotifier {
 
   List<Place> get places => _places;
   bool get isLoading => _isLoading;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Stream<List<Place>> get placesStream {
+  Future<void> fetchPlaces() async {
     _setLoading(true);
     User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      return FirebaseFirestore.instance
+
+    try {
+      QuerySnapshot snapshot = await _firestore
           .collection('users')
-          .doc(user.uid)
+          .doc(user?.uid)
           .collection('memories')
           .orderBy('takenAt', descending: true)
-          .snapshots()
-          .map((snapshot) {
-        _places = snapshot.docs.map((doc) {
-          return Place.fromMap(doc.data());
-        }).toList();
-        _setLoading(false);
-        return _places;
-      });
-    } else {
+          .get();
+      _places = snapshot.docs.map((doc) => Place.fromSnapshot(doc)).toList();
       _setLoading(false);
-      return Stream.value([]);
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        notifyListeners();
+      });
+    } catch (error) {
+      print('Error fetching places: $error');
+
+      _setLoading(false);
     }
   }
 
   Future<void> savePlace(
     String title,
-    String imagePath,
+    List<String> imagePaths,
     double latitude,
     double longitude,
   ) async {
@@ -50,19 +51,23 @@ class PlacesProvider with ChangeNotifier {
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) return;
 
-      String imageId = const Uuid().v4();
-      Reference storageRef = FirebaseStorage.instance
-          .ref()
-          .child('users/${user.uid}/memories/$imageId');
-      UploadTask uploadTask = storageRef.putFile(File(imagePath));
+      List<String> imageUrls = [];
+      for (String imagePath in imagePaths) {
+        String imageId = const Uuid().v4();
+        Reference storageRef = FirebaseStorage.instance
+            .ref()
+            .child('users/${user.uid}/memories/$imageId');
+        UploadTask uploadTask = storageRef.putFile(File(imagePath));
 
-      TaskSnapshot taskSnapshot = await uploadTask;
-      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+        TaskSnapshot taskSnapshot = await uploadTask;
+        String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+        imageUrls.add(downloadUrl);
+      }
 
       Place newPlace = Place(
         id: const Uuid().v4(),
         title: title,
-        imageUrl: downloadUrl,
+        imageUrl: imageUrls,
         latitude: latitude,
         longitude: longitude,
         takenAt: DateTime.now(),
@@ -109,6 +114,8 @@ class PlacesProvider with ChangeNotifier {
 
   void _setLoading(bool loading) {
     _isLoading = loading;
-    notifyListeners();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
 }

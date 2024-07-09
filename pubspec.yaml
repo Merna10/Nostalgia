@@ -67,7 +67,7 @@ dev_dependencies:
   flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.13.1
 flutter_icons:
-  image_path: "icons/camera_13498879.png"
+  image_path: "icons/N-09-07-2024 (1).png"
   android: true
   ios: true
 

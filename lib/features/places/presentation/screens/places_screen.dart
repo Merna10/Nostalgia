@@ -4,22 +4,29 @@ import 'package:hexcolor/hexcolor.dart';
 import 'package:nostalgia/core/widgets/restart_widget.dart';
 import 'package:nostalgia/features/places/data/model/place.dart';
 import 'package:nostalgia/features/places/data/providers/places_provider.dart';
+import 'package:nostalgia/features/places/presentation/widgets/place_item.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'add_place_screen.dart';
-import '../widgets/place_item.dart';
+
 
 class PlacesListScreen extends StatefulWidget {
-  const PlacesListScreen({Key? key}) : super(key: key);
+  const PlacesListScreen({super.key});
 
   @override
-  _PlacesListScreenState createState() => _PlacesListScreenState();
+  State<PlacesListScreen> createState() => _PlacesListScreenState();
 }
 
 class _PlacesListScreenState extends State<PlacesListScreen> {
   List<Place> selectedPlaces = [];
   bool isSelectionMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch data when the screen is first loaded or resumed
+    Provider.of<PlacesProvider>(context, listen: false).fetchPlaces();
+  }
 
   void _onPlaceSelected(Place place) {
     setState(() {
@@ -28,7 +35,6 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
       } else {
         selectedPlaces.add(place);
       }
-
       isSelectionMode = selectedPlaces.isNotEmpty;
     });
   }
@@ -79,7 +85,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
     return Scaffold(
       body: Consumer<PlacesProvider>(
         builder: (context, placesProvider, _) {
-          List<Place> places = Provider.of<List<Place>>(context);
+          List<Place> places = placesProvider.places;
           bool isLoading = placesProvider.isLoading;
 
           return Container(

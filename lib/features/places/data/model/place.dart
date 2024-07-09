@@ -1,4 +1,4 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Place {
   Place({
@@ -12,7 +12,7 @@ class Place {
 
   String id;
   String title;
-  String imageUrl;
+  List<String> imageUrl;
   double latitude;
   double longitude;
   DateTime takenAt;
@@ -25,6 +25,18 @@ class Place {
         longitude: (json["longitude"] ?? 0.0).toDouble(),
         takenAt: DateTime.tryParse(json["takenAt"] ?? '') ?? DateTime.now(),
       );
+
+  factory Place.fromSnapshot(DocumentSnapshot snapshot) {
+    Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+    return Place(
+      id: snapshot.id,
+      title: data['title'] ?? 'Untitled',
+      imageUrl: List<String>.from(data['imageUrl'] ?? []),
+      latitude: (data['latitude'] ?? 0.0).toDouble(),
+      longitude: (data['longitude'] ?? 0.0).toDouble(),
+      takenAt: DateTime.tryParse(data['takenAt'] ?? '') ?? DateTime.now(),
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         "id": id,

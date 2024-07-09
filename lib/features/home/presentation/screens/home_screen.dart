@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:nostalgia/features/places/screens/places_screen.dart';
+import 'package:nostalgia/features/places/presentation/screens/places_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -55,7 +55,7 @@ class HomePage extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: HexColor('ff6608'),
-                  minimumSize: const Size(0, 50), // Set the desired height here
+                  minimumSize: const Size(0, 50), 
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   textStyle: const TextStyle(
                     color: Colors.black,

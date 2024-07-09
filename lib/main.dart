@@ -17,7 +17,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +25,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => custom_auth.AuthProvider()), 
         ChangeNotifierProvider(create: (_) => PlacesProvider()),
-        StreamProvider<List<Place>>(
-          create: (context) => context.read<PlacesProvider>().placesStream,
-          initialData: const [],
-        ),
+        
       ],
       child: MaterialApp(
         title: 'Nostalgia',
